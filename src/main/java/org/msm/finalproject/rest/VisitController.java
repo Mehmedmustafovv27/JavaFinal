@@ -1,5 +1,7 @@
 package org.msm.finalproject.rest;
 
+import org.msm.finalproject.dto.VisitDto;
+import org.msm.finalproject.mapper.VisitMapper;
 import org.msm.finalproject.model.Visit;
 import org.msm.finalproject.service.VisitService;
 import org.springframework.web.bind.annotation.*;
@@ -17,16 +19,22 @@ public class VisitController {
         this.visitService = visitService;
     }
 
+    // ✅ CREATE – приема entity (OK), връща DTO
     @PostMapping
-    public Visit create(@RequestBody Visit visit) {
-        return visitService.save(visit);
+    public VisitDto create(@RequestBody Visit visit) {
+        Visit saved = visitService.save(visit);
+        return VisitMapper.toDto(saved);
     }
 
+    // ✅ READ – връща DTO вместо entity
     @GetMapping("/vet/{vetId}")
-    public List<Visit> getForVetOnDate(
+    public List<VisitDto> getForVetOnDate(
             @PathVariable Long vetId,
             @RequestParam LocalDate date) {
 
-        return visitService.getVisitsForVetOnDate(vetId, date);
+        return visitService.getVisitsForVetOnDate(vetId, date)
+                .stream()
+                .map(VisitMapper::toDto)
+                .toList();
     }
 }
